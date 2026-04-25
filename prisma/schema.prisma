@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(CUSTOMER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Product {
+  id          String      @id @default(cuid())
+  name        String
+  slug        String      @unique
+  description String
+  priceCents  Int
+  imageUrl    String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  orderItems  OrderItem[]
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  customerName  String
+  customerEmail String
+  address       String
+  totalCents    Int
+  status        OrderStatus @default(PENDING)
+  createdAt     DateTime    @default(now())
+  items         OrderItem[]
+}
+
+model OrderItem {
+  id           String   @id @default(cuid())
+  orderId      String
+  productId    String?
+  productName  String
+  quantity     Int
+  unitPrice    Int
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product      Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+}
+
+enum Role {
+  ADMIN
+  CUSTOMER
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+}
