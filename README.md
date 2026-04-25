@@ -7,7 +7,7 @@ A simple online bakery application built for the assignment requirements:
 - Checkout flow with name, email, and delivery address
 - Admin panel for adding, editing, and deleting products
 - Admin authentication separate from the customer storefront
-- Real database persistence with Prisma + SQLite
+- Real database persistence with Prisma + Supabase Postgres
 
 ## Stack
 
@@ -15,7 +15,7 @@ A simple online bakery application built for the assignment requirements:
 - React 19
 - TypeScript
 - Prisma ORM
-- SQLite
+- Supabase Postgres
 
 ## Local Setup
 
@@ -25,19 +25,34 @@ A simple online bakery application built for the assignment requirements:
 npm install
 ```
 
-2. Create the database and seed initial data:
+2. Create a local `.env` file from the example:
+
+```bash
+cp .env.example .env
+```
+
+3. Update `.env` with your Supabase session pooler connection string and auth secret:
+
+```env
+DATABASE_URL="postgresql://postgres.<project-ref>:<password>@aws-<region>.pooler.supabase.com:5432/postgres"
+AUTH_SECRET="your-long-random-secret"
+```
+
+Use the `5432` session pooler URL for local development.
+
+4. Push the schema and seed initial data:
 
 ```bash
 npm run db:setup
 ```
 
-3. Start the development server:
+5. Start the development server:
 
 ```bash
 npm run dev
 ```
 
-4. Open `http://localhost:3000`
+6. Open `http://localhost:3000`
 
 ## Admin Login
 
@@ -61,9 +76,20 @@ npm run db:setup
 - Product images are stored as URLs so the admin can manage them without a file upload pipeline.
 - Orders are saved with item snapshots so deleting a product later does not break order history.
 
-## Deployment Note
+## Deployment
 
-This project uses SQLite for a simple real database setup. For a live deployment you can:
+Production is deployed on Vercel with Supabase Postgres.
 
-- Deploy to Render or Railway with a persistent disk and keep SQLite
-- Switch Prisma to Postgres or Supabase if you want a serverless-friendly production database
+Required Vercel environment variables:
+
+```env
+DATABASE_URL="postgresql://postgres.<project-ref>:<password>@aws-<region>.pooler.supabase.com:6543/postgres"
+AUTH_SECRET="your-long-random-secret"
+```
+
+Use:
+
+- `5432` session pooler URL for local development
+- `6543` transaction pooler URL for Vercel/serverless deployment
+
+Live app: [https://bakery-app-sigma.vercel.app](https://bakery-app-sigma.vercel.app)
